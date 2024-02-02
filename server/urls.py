@@ -16,10 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from user.views import UserView
+import user.views as user_views
+from django.http import JsonResponse
 
 urlpatterns = [
+    path("", lambda request: JsonResponse({"message": "Reclos Backend is running"})),
     path("admin/", admin.site.urls),
-    path("api/user/", UserView.as_view()),
-    path("accounts/", include("allauth.urls"))
+    path("accounts/", include("allauth.urls")),
+    
+    path("api/user/", include("user.urls")),
 ]
