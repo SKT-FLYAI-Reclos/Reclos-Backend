@@ -104,5 +104,29 @@ Registers a new user to the application.
 | `password1` | `string` | **Required**. Password                 |
 | `password2` | `string` | **Required**. Password confirmation    |
 
+#### Token Verification
+
+```http
+  POST api/user/token/verify/
+```
+
+Verifies a token obtained from the login endpoint.
+
+| Parameter | Type     | Description                            |
+| :-------- | :------- | :--------------------------------
+| `token`   | `string` | **Required**. The token to verify      |
+
+#### Token Refresh
+
+```http
+  POST api/user/token/refresh/
+```
+
+Obtains a new access token using a refresh token.
+
+| Parameter      | Type     | Description                            |
+| :------------- | :------- | :------------------------------------- |
+| `refresh`      | `string` | **Required**. The refresh token        |
+
 
 These endpoints are provided by `dj-rest-auth` and handle various aspects of user authentication, registration, and account management. The actual behavior and requirements of each endpoint might vary depending on the configuration of `dj-rest-auth` and your Django project settings.
