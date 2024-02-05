@@ -2,37 +2,36 @@ Python 3.11.5
 
 # Setup
 
-### Venv
+#### Venv
 ```
 python -m venv .venv
 .venv\Scripts\activate
 ```
 
-### Install
+#### Install
 ```
 pip install -r requirements.txt
 ```
 
-### Create DB Schema
+#### Create DB Schema
 In mysql, create schema "reclos"
 
-### Create .env
+#### Create .env
 Copy .env.example to .env and fill in the values
 
-### Run Server
+#### Run Server
 ```
 python manage.py makemigrations
 python manage.py migrate
 python manage.py runserver
 ```
 
-
 # API Reference
 
 #### User Login
 
 ```http
-  POST /login/
+  POST api/user/login/
 ```
 
 Allows users to log in and obtain authentication credentials.
@@ -45,7 +44,7 @@ Allows users to log in and obtain authentication credentials.
 #### User Logout
 
 ```http
-  POST /logout/
+  POST api/user/logout/
 ```
 
 Logs out the current authenticated user.
@@ -53,7 +52,7 @@ Logs out the current authenticated user.
 #### Password Change
 
 ```http
-  POST /password/change/
+  POST api/user/password/change/
 ```
 
 Allows an authenticated user to change their password.
@@ -66,7 +65,7 @@ Allows an authenticated user to change their password.
 #### Password Reset
 
 ```http
-  POST /password/reset/
+  POST api/user/password/reset/
 ```
 
 Initiates a password reset process for a user.
@@ -78,7 +77,7 @@ Initiates a password reset process for a user.
 #### Password Reset Confirm
 
 ```http
-  POST /password/reset/confirm/
+  POST api/user/password/reset/confirm/
 ```
 
 Completes the password reset process.
@@ -93,7 +92,7 @@ Completes the password reset process.
 #### User Signup
 
 ```http
-  POST /signup/
+  POST api/user/signup/
 ```
 
 Registers a new user to the application.
@@ -105,26 +104,5 @@ Registers a new user to the application.
 | `password1` | `string` | **Required**. Password                 |
 | `password2` | `string` | **Required**. Password confirmation    |
 
-#### User Detail (Email Verification Status)
-
-```http
-  GET /signup/verification-email/
-```
-
-Returns the verification status of the user's email.
-
-#### Email Verification
-
-```http
-  POST /signup/verification-email/
-```
-
-Triggers a new verification email to be sent.
-
-| Parameter  | Type     | Description                           |
-| :--------- | :------- | :------------------------------------ |
-| `key`      | `string` | **Required**. Verification key received in the email |
-
----
 
 These endpoints are provided by `dj-rest-auth` and handle various aspects of user authentication, registration, and account management. The actual behavior and requirements of each endpoint might vary depending on the configuration of `dj-rest-auth` and your Django project settings.
