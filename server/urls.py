@@ -23,6 +23,5 @@ urlpatterns = [
     path("", lambda request: JsonResponse({"message": "Reclos Backend is running"})),
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
-    
     path("api/user/", include("user.urls")),
 ]

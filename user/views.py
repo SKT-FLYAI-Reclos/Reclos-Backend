@@ -6,6 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, status
 
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 from .models import User
 from .serializers import UserSerializer
 
@@ -15,20 +18,12 @@ class UserView(APIView):
         serializer = UserSerializer(users, many=True)
         return Response({"users": serializer.data})
 
-class UserCreate(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+class TokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token["username"] = user.username
+        return token
 
-class UserLogin(APIView):
-    def post(self, request):
-        username = request.data.get("username")
-        password = request.data.get("password")
-        
-        user = authenticate(username=username, password=password)
-        
-        if user:
-            token, created = Token.objects.get_or_create(user=user)
-            return Response({"token": token.key})
-        
-        return Response(data = {"message": "Invalid credentials"}, status = status.HTTP_401_UNAUTHORIZED)
-
+class TokenObtainPairView(TokenObtainPairView):
+    serializer_class = TokenObtainPairSerializer
