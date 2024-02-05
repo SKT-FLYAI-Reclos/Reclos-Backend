@@ -175,10 +175,15 @@ REST_FRAMEWORK = {
     ]
 }
 
+REST_AUTH = { 
+    "USE_JWT" : True,
+    "JWT_AUTH_HTTPONLY" : False,
+}
+
 import datetime
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(days=1),
-    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=7),
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,
 }
