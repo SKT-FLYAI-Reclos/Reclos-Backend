@@ -27,7 +27,7 @@ python manage.py runserver
 ```
 
 
-## API Reference
+# API Reference
 
 #### User Login
 
