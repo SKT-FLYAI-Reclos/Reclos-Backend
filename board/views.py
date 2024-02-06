@@ -15,10 +15,19 @@ class BoardView(APIView):
         else:
             return [IsAuthenticated()]
     
-    def get(self, request):
-        boards = Board.objects.all()
-        serializer = BoardSerializer(boards, many=True)
-        return Response({"boards": serializer.data})
+    def get(self, request, id=None):
+        if id is None:
+            boards = Board.objects.all()
+            serializer = BoardSerializer(boards, many=True)
+            return Response(serializer.data)
+        else:
+            try:
+                board = Board.objects.get(id=id)
+            except Board.DoesNotExist:
+                return Response({"message": "no board"}, status=status.HTTP_404_NOT_FOUND)
+            
+            serializer = BoardSerializer(board)
+            return Response(serializer.data)
 
     def post(self, request):
         serializer = BoardSerializer(data=request.data)
