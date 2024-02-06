@@ -142,3 +142,29 @@ Obtains a new access token using a refresh token.
 | `refresh` | `string` | **Required**. Refresh token    |
 
 
+### Initiate Kakao Login
+
+To start the Kakao login process, direct the user to the following URL:
+
+```url
+https://kauth.kakao.com/oauth/authorize?client_id=<KAKAO_REST_API_KEY>&redirect_uri=<REDIRECT_URI>&response_type=code
+```
+
+Replace `<KAKAO_REST_API_KEY>` with your Kakao REST API Key and `<REDIRECT_URI>` with the URI where you want Kakao to send the response (this should match the one configured in your Kakao application settings). The user will be prompted to log in to Kakao and authorize your application.
+
+### Kakao Login
+
+After the user logs in and authorizes the application, Kakao will redirect them to your specified `redirect_uri` with a `code` query parameter. Use this code to complete the login process:
+
+```http
+GET /api/user/kakao/login/?code=<code>
+```
+
+This endpoint on your server should handle the code exchange for an access token and retrieve the user's information from Kakao.
+
+| Parameter | Type     | Description                                  |
+|-----------|----------|----------------------------------------------|
+| `code`    | `string` | **Required**. Code provided by Kakao after user login |
+
+On success, this endpoint returns JWT tokens (`access` and `refresh`) along with the user's basic information.
+
