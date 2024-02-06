@@ -1,2 +1,12 @@
 # board
 이미지
+
+
+# token
+토큰 타임 시간대 수정
+
+
+
+# memo
+
+https://kauth.kakao.com/oauth/authorize?client_id=749342369691659c4b80f5f2017197f7&redirect_uri=http://127.0.0.1:8000/api/user/kakao/callback/&response_type=code
