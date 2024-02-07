@@ -190,4 +190,4 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 
 
 ## Connection
-ALLOWED_HOSTS = ["52.78.115.75"]
+ALLOWED_HOSTS = ["*"]
