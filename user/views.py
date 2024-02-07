@@ -79,7 +79,14 @@ class KakaoLoginView(APIView):
         refresh = RefreshToken.for_user(user)
 
         return token_return(refresh, user)
-    
+
+class UserMyView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        user_info = UserSerializer(user).data
+        return Response(user_info)
 
 def token_return(refresh, user):
     return Response(
