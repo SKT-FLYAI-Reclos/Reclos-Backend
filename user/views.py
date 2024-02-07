@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
@@ -12,7 +13,9 @@ from .models import User
 from .serializers import UserSerializer
 
 import requests
-from rest_framework_simplejwt.tokens import RefreshToken
+import jwt
+from django.conf import settings
+
 import os
 import dotenv
 dotenv.load_dotenv()
@@ -81,12 +84,22 @@ class KakaoLoginView(APIView):
         return token_return(refresh, user)
 
 class UserMyView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
-        user = request.user
-        user_info = UserSerializer(user).data
-        return Response(user_info)
+        token_cookie = self.request.COOKIES.get("refresh_token")
+        print(token_cookie)
+
+        if not token_cookie:
+            return Response({"error": "No token provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+        payload = jwt.decode(token_cookie, settings.SECRET_KEY, algorithms=["HS256"])
+        user_id = payload["user_id"]
+        user = User.objects.get(pk=user_id)
+        refresh = RefreshToken.for_user(user)
+
+        return token_return(refresh, user)
+
 
 def token_return(refresh, user):
     return Response(

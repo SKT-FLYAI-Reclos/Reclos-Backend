@@ -62,6 +62,14 @@ POST /api/user/logout/
 
 Logs out the current authenticated user.
 
+### User Check
+
+```http
+GET /api/user/my/
+```
+
+Retrieves the current authenticated user's information.
+
 ### Password Change
 
 ```http
