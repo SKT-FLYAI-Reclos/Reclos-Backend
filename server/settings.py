@@ -187,3 +187,7 @@ SIMPLE_JWT = {
 }
 
 ACCOUNT_EMAIL_VERIFICATION = "none"
+
+
+## Connection
+ALLOWED_HOSTS = ["*"]

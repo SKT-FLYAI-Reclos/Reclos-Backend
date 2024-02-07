@@ -168,3 +168,6 @@ This endpoint on your server should handle the code exchange for an access token
 
 On success, this endpoint returns JWT tokens (`access` and `refresh`) along with the user's basic information.
 
+
+
+## Board
