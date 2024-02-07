@@ -81,7 +81,15 @@ class KakaoLoginView(APIView):
         user, created = User.objects.get_or_create(username=username)
         refresh = RefreshToken.for_user(user)
 
-        return token_return(refresh, user)
+        response = token_return(refresh, user)
+        response.set_cookie(
+            "refresh_token",
+            str(refresh),
+            httponly=True,
+            secure=True,
+        )
+        
+        return response
 
 class UserMyView(APIView):
     permission_classes = [AllowAny]
