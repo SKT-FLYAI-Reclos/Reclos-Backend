@@ -58,8 +58,6 @@ class KakaoLoginView(APIView):
                 "client_id": os.getenv("KAKAO_REST_API_KEY"),
                 "redirect_uri": os.getenv("BASE_URL") + "/api/user/kakao/login/",
                 "code": code,
-                "sameSite": "None",
-                "secure": "False"
             },
         )
         token_response_json = token_request.json()
@@ -88,7 +86,7 @@ class KakaoLoginView(APIView):
             "refresh_token",
             str(refresh),
             httponly=True,
-            secure=True,
+            secure=False,
         )
         
         return response
