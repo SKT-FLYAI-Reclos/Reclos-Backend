@@ -179,3 +179,76 @@ On success, this endpoint returns JWT tokens (`access` and `refresh`) along with
 
 
 ## Board
+
+### List All Boards
+
+```http
+GET /api/board/
+```
+
+Retrieves all boards. This endpoint does not require authentication, allowing any user to view all boards.
+
+### Retrieve a Specific Board
+
+```http
+GET /api/board/<int:id>/
+```
+
+Retrieves a specific board by its `id`. This endpoint does not require authentication, allowing any user to view specific board details.
+
+| Parameter | Type     | Description                       |
+|-----------|----------|-----------------------------------|
+| `id`      | `int`    | **Required**. The ID of the board to retrieve. |
+
+### Create a New Board
+
+```http
+POST /api/board/
+```
+
+Allows an authenticated user to create a new board. This endpoint requires authentication.
+
+| Parameter  | Type     | Description                           |
+|------------|----------|---------------------------------------|
+| `title`    | `string` | **Required**. The title of the board. |
+| `content`  | `string` | **Required**. The content of the board. |
+| `image`    | `file`   | Optional. An image file associated with the board. |
+
+To post a board with an image, ensure the request's `Content-Type` is set to `multipart/form-data`.
+
+### Delete a Specific Board
+
+```http
+DELETE /api/board/<int:id>/
+```
+
+Allows the author of a board to delete it. This endpoint requires authentication and authorship verification.
+
+| Parameter | Type     | Description                                  |
+|-----------|----------|----------------------------------------------|
+| `id`      | `int`    | **Required**. The ID of the board to delete. |
+
+Upon successful deletion, the server responds with a `204 No Content` status code, indicating that the operation was successful but there is no content to return.
+
+### Note on Image Uploads
+
+For image uploads, the frontend needs to send the data as `multipart/form-data`. This enables the inclusion of files in the POST request. Here is an example of a simple HTML form for creating a new board with an optional image:
+
+```html
+<form id="boardForm" method="post" enctype="multipart/form-data">
+  <input type="text" name="title" placeholder="Title" required>
+  <textarea name="content" placeholder="Content" required></textarea>
+  <input type="file" name="image" accept="image/*">
+  <button type="submit">Submit</button>
+</form>
+```
+
+JavaScript can be used to handle the form submission asynchronously, as shown in the earlier example, ensuring a smooth user experience without requiring a page reload.
+
+### Security and Permissions
+
+- **GET** requests to list or retrieve boards do not require authentication, making them accessible to any user.
+- **POST** and **DELETE** requests require the user to be authenticated, ensuring that only authorized users can create or delete boards.
+- The deletion of a board is further restricted to its author, enhancing security by preventing unauthorized deletions.
+
+
