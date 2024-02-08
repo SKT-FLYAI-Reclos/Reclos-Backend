@@ -96,7 +96,6 @@ class UserMyView(APIView):
 
     def get(self, request):
         token_cookie = self.request.COOKIES.get("refresh_token")
-        print(token_cookie)
 
         if not token_cookie:
             return Response({"error": "No token provided"}, status=status.HTTP_400_BAD_REQUEST)

@@ -55,9 +55,13 @@ INSTALLED_APPS = [
     
     # providers
     "allauth.socialaccount.providers.kakao",
+    
+    # cors
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "cors.headers.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -191,3 +195,6 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 
 ## Connection
 ALLOWED_HOSTS = ["*"]
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
