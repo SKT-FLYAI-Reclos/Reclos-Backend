@@ -56,7 +56,7 @@ class KakaoLoginView(APIView):
             data={
                 "grant_type": "authorization_code",
                 "client_id": os.getenv("KAKAO_REST_API_KEY"),
-                "redirect_uri": os.getenv("BASE_URL") + "/api/user/kakao/login/",
+                "redirect_uri": "http://localhost:3000/login/kakao-callback",
                 "code": code,
             },
         )
