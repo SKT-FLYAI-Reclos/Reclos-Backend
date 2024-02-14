@@ -85,8 +85,9 @@ class KakaoLoginView(APIView):
         response.set_cookie(
             "refresh_token",
             str(refresh),
-            httponly=True,
+            httponly=False,
             secure=False,
+            samesite="None",
         )
         
         return response
