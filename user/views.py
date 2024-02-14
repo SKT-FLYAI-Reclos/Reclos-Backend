@@ -22,12 +22,9 @@ dotenv.load_dotenv()
 
 BASE_URL = os.getenv("BASE_URL")
 
+
 class UserView(APIView):
-    def get_permissions(self):
-        if self.request.method == "GET":
-            return [AllowAny()]
-        else:
-            return [IsAuthenticated()]
+    permission_classes = [AllowAny]
     
     def get(self, request, id=None):
         if id:
@@ -81,39 +78,41 @@ class KakaoLoginView(APIView):
         user, created = User.objects.get_or_create(username=username)
         refresh = RefreshToken.for_user(user)
 
-        response = token_return(refresh, user)
-        response.set_cookie(
-            "refresh_token",
-            str(refresh),
-            httponly=False,
-            secure=False,
-            samesite="None",
-        )
-        
+        response = access_token_return(refresh.access_token, user)
         return response
 
 class UserMyView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        token_cookie = self.request.COOKIES.get("refresh_token")
+        access_token = request.headers.get("Authorization")
 
-        if not token_cookie:
-            return Response({"error": "No token provided"}, status=status.HTTP_400_BAD_REQUEST)
+        if not access_token:
+            return Response({"error": "No access token provided"}, status=status.HTTP_400_BAD_REQUEST)
 
-        payload = jwt.decode(token_cookie, settings.SECRET_KEY, algorithms=["HS256"])
+        payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
         user_id = payload["user_id"]
         user = User.objects.get(pk=user_id)
-        refresh = RefreshToken.for_user(user)
+        
+        return Response(access_token_return(access_token, user))
 
-        return token_return(refresh, user)
 
-
-def token_return(refresh, user):
+def refresh_token_return(refresh, user):
     return Response(
         {
             "refresh": str(refresh),
             "access": str(refresh.access_token),
+            "user": {
+                "pk": user.pk,
+                "username": user.username,
+            }
+        }
+    )
+    
+def access_token_return(access_token, user):
+    return Response(
+        {
+            "access": str(access_token),
             "user": {
                 "pk": user.pk,
                 "username": user.username,

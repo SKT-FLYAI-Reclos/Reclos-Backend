@@ -9,11 +9,7 @@ from .models import Board
 from .serializers import BoardSerializer
 
 class BoardView(APIView):
-    def get_permissions(self):
-        if self.request.method == "GET":
-            return [AllowAny()]
-        else:
-            return [IsAuthenticated()]
+    permission_classes = [AllowAny]
     
     def get(self, request, id=None):
         if id is None:
