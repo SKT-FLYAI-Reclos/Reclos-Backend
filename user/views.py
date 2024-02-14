@@ -86,6 +86,7 @@ class UserMyView(APIView):
 
     def get(self, request):
         access_token = request.headers.get("Authorization")
+        print(access_token)
 
         if not access_token:
             return Response({"error": "No access token provided"}, status=status.HTTP_400_BAD_REQUEST)
