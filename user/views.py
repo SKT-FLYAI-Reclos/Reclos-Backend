@@ -97,7 +97,7 @@ class UserMyView(APIView):
         user_id = payload["user_id"]
         user = User.objects.get(pk=user_id)
         
-        return Response(access_token_return(access_token, user))
+        return access_token_return(access_token, user)
 
 
 def refresh_token_return(refresh, user):
