@@ -4,23 +4,23 @@ from django.core.files import File
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 
 from .models import Board, Images, Likes
 from user.models import User
-from .serializers import BoardSerializer, ImagesSerializer, LikesSerializer
+from .serializers import BoardSerializer
 
 class BoardView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request, id=None):
         if id is None:
-            boards = Board.objects.all().prefetch_related("images, likes")
+            boards = Board.objects.all().prefetch_related("images", "likes")
             serializer = BoardSerializer(boards, many=True)
             return Response(serializer.data)
         else:
             try:
-                board = Board.objects.prefetch_related("images, likes").get(id=id)
+                board = Board.objects.prefetch_related("images", "likes").get(id=id)
             except Board.DoesNotExist:
                 return Response({"message": "no board"}, status=status.HTTP_404_NOT_FOUND)
             
@@ -74,6 +74,7 @@ class DummyBoardView(APIView):
         authors = [1, 2, 3]  # Assuming these user IDs exist in your user model
         image_paths = ["./src/ex1.jpg", "./src/ex2.jpg", "./src/ex3.jpg"]  # Adjust paths as necessary
         categories = ["category1", "category2", "category3"]
+        likes = [0, 0, 0]
         
         for i in range(3):
             # Open the image file in binary mode
@@ -86,7 +87,17 @@ class DummyBoardView(APIView):
                 )
                 board.save()
                 
-                img = Images(board=board, image=File(img_file))
-                img.save()
-        
+                like = Likes(user=User.objects.get(id=authors[i]), board=board)
+                like.save()
+                
+                if i == 2:
+                    img = Images(board=board, image=File(img_file))
+                    more_img = Images(board=board, image=File(img_file))
+                    img.save()
+                    more_img.save()
+                
+                else:
+                    img = Images(board=board, image=File(img_file))
+                    img.save()
+            
         return Response({"message": "Dummy boards created successfully"})

@@ -14,11 +14,11 @@ class Board(models.Model):
         
 class Likes(models.Model):
     user = models.ForeignKey("user.User", on_delete=models.CASCADE)
-    board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, related_name = 'likes', on_delete=models.CASCADE)
     
     class Meta:
         unique_together = ("user", "board")
 
 class Images(models.Model):
-    board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, related_name = 'images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to="", null = False, blank = False)
