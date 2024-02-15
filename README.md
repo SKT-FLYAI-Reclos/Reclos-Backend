@@ -176,6 +176,13 @@ This endpoint on your server should handle the code exchange for an access token
 
 On success, this endpoint returns JWT tokens (`access` and `refresh`) along with the user's basic information.
 
+### Dummy User
+    
+```http
+GET /api/user/dummy/
+```
+
+Creates a dummy user for testing purposes.
 
 
 ## Board
@@ -212,7 +219,8 @@ Allows an authenticated user to create a new board. This endpoint requires authe
 |------------|----------|---------------------------------------|
 | `title`    | `string` | **Required**. The title of the board. |
 | `content`  | `string` | **Required**. The content of the board. |
-| `image`    | `file`   | Optional. An image file associated with the board. |
+| `category` | `string` | Optional. The category of the board. |
+| `images`    | `file`   | Optional. image files to upload. |
 
 To post a board with an image, ensure the request's `Content-Type` is set to `multipart/form-data`.
 
@@ -230,25 +238,20 @@ Allows the author of a board to delete it. This endpoint requires authentication
 
 Upon successful deletion, the server responds with a `204 No Content` status code, indicating that the operation was successful but there is no content to return.
 
-### Note on Image Uploads
 
-For image uploads, the frontend needs to send the data as `multipart/form-data`. This enables the inclusion of files in the POST request. Here is an example of a simple HTML form for creating a new board with an optional image:
+### Like a Board
 
-```html
-<form id="boardForm" method="post" enctype="multipart/form-data">
-  <input type="text" name="title" placeholder="Title" required>
-  <textarea name="content" placeholder="Content" required></textarea>
-  <input type="file" name="image" accept="image/*">
-  <button type="submit">Submit</button>
-</form>
+```http
+POST /api/board/<int:id>/like/
 ```
 
-JavaScript can be used to handle the form submission asynchronously, as shown in the earlier example, ensuring a smooth user experience without requiring a page reload.
-
-### Security and Permissions
-
-- **GET** requests to list or retrieve boards do not require authentication, making them accessible to any user.
-- **POST** and **DELETE** requests require the user to be authenticated, ensuring that only authorized users can create or delete boards.
-- The deletion of a board is further restricted to its author, enhancing security by preventing unauthorized deletions.
+Allows an user like a board, this endpoint toggles the like status of the board.
 
 
+### Dummy Board
+
+```http
+GET /api/board/dummy/
+```
+
+Creates a dummy board for testing purposes.

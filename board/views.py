@@ -72,6 +72,7 @@ class DummyBoardView(APIView):
         contents = ["content1", "content2", "content3"]
         authors = [1, 2, 3]  # Assuming these user IDs exist in your user model
         image_paths = ["./src/ex1.jpg", "./src/ex2.jpg", "./src/ex3.jpg"]  # Adjust paths as necessary
+        categories = ["category1", "category2", "category3"]
         
         for i in range(3):
             # Open the image file in binary mode
@@ -79,7 +80,8 @@ class DummyBoardView(APIView):
                 board = Board(
                     title=titles[i],
                     content=contents[i],
-                    author=User.objects.get(id=authors[i])
+                    author=User.objects.get(id=authors[i]),
+                    category=categories[i]
                 )
                 board.image.save(f"ex{i}.jpg", File(img_file), save=False)
                 board.save()
