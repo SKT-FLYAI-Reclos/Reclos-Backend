@@ -83,7 +83,9 @@ class DummyBoardView(APIView):
                     author=User.objects.get(id=authors[i]),
                     category=categories[i]
                 )
-                board.image.save(f"ex{i}.jpg", File(img_file), save=False)
                 board.save()
+                
+                img = Images(board=board, image=File(img_file))
+                img.save()
         
         return Response({"message": "Dummy boards created successfully"})
