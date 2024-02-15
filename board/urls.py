@@ -5,4 +5,5 @@ urlpatterns = [
     path("", BoardView.as_view()),
     path("<int:id>/", BoardView.as_view()),
     path("dummy/", DummyBoardView.as_view()),
+    path("<int:id>/like/", DummyBoardView.as_view()),
 ]

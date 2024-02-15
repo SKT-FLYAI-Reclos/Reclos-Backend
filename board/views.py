@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import Board
+from .models import Board, Images, Likes
 from user.models import User
 from .serializers import BoardSerializer
 
@@ -30,7 +30,12 @@ class BoardView(APIView):
     def post(self, request):
         serializer = BoardSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(author=request.user)
+            board = serializer.save(author=request.user)
+            
+            images = request.FILES.getlist("images")
+            for img in images:
+                Images.objects.create(board=board, image=img)
+                
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
@@ -43,6 +48,20 @@ class BoardView(APIView):
         board.delete()
         return Response({"message": "deleted"}, status=status.HTTP_204_NO_CONTENT)
 
+class ToggleLikeView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request, id):
+        try:
+            board = Board.objects.get(id=id)
+        except Board.DoesNotExist:
+            return Response({"message": "no board"}, status=status.HTTP_404_NOT_FOUND)
+        
+        like, created = Likes.objects.get_or_create(user=request.user, board=board)
+        if not created:
+            like.delete()
+            return Response({"message": "unliked"})
+        return Response({"message": "liked"})
 
 
 class DummyBoardView(APIView):
