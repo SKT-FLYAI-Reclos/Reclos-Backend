@@ -15,7 +15,7 @@ class LikesSerializer(serializers.ModelSerializer):
 class BoardSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     images = ImagesSerializer(many=True, read_only=True)
-    Likes = LikesSerializer(many=True, read_only=True)
+    likes = LikesSerializer(many=True, read_only=True)
     
     class Meta:
         model = Board
