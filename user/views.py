@@ -122,3 +122,19 @@ def access_token_return(access_token, user):
             }
         }
     )
+
+
+class DummyDataView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        usernames = ["DummyUser1", "DummyUser2", "DummyUser3", "DummyUser4", "DummyUser5"]
+        passwords = ["password1", "password2", "password3", "password4", "password5"]
+        for i in range(5):
+            user, created = User.objects.get_or_create(username=usernames[i])
+            if created:
+                user.set_password(passwords[i])
+                user.save()
+        
+        return Response({"message": "User Dummy data created"}, status=status.HTTP_200_OK)
+        

@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.core.files import File
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,6 +7,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Board
+from user.models import User
 from .serializers import BoardSerializer
 
 class BoardView(APIView):
@@ -40,3 +42,27 @@ class BoardView(APIView):
         
         board.delete()
         return Response({"message": "deleted"}, status=status.HTTP_204_NO_CONTENT)
+
+
+
+class DummyBoardView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        titles = ["title1", "title2", "title3"]
+        contents = ["content1", "content2", "content3"]
+        authors = [1, 2, 3]  # Assuming these user IDs exist in your user model
+        image_paths = ["./src/ex1.jpg", "./src/ex2.jpg", "./src/ex3.jpg"]  # Adjust paths as necessary
+        
+        for i in range(3):
+            # Open the image file in binary mode
+            with open(image_paths[i], 'rb') as img_file:
+                board = Board(
+                    title=titles[i],
+                    content=contents[i],
+                    author=User.objects.get(id=authors[i])
+                )
+                board.image.save(f"ex{i}.jpg", File(img_file), save=False)
+                board.save()
+        
+        return Response({"message": "Dummy boards created successfully"})
