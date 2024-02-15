@@ -8,19 +8,19 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Board, Images, Likes
 from user.models import User
-from .serializers import BoardSerializer
+from .serializers import BoardSerializer, ImagesSerializer, LikesSerializer
 
 class BoardView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request, id=None):
         if id is None:
-            boards = Board.objects.all()
+            boards = Board.objects.all().prefetch_related("images, likes")
             serializer = BoardSerializer(boards, many=True)
             return Response(serializer.data)
         else:
             try:
-                board = Board.objects.get(id=id)
+                board = Board.objects.prefetch_related("images, likes").get(id=id)
             except Board.DoesNotExist:
                 return Response({"message": "no board"}, status=status.HTTP_404_NOT_FOUND)
             
@@ -47,6 +47,7 @@ class BoardView(APIView):
         
         board.delete()
         return Response({"message": "deleted"}, status=status.HTTP_204_NO_CONTENT)
+
 
 class ToggleLikeView(APIView):
     permission_classes = [AllowAny]
