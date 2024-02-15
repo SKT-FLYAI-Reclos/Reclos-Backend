@@ -74,7 +74,6 @@ class DummyBoardView(APIView):
         authors = [1, 2, 3]  # Assuming these user IDs exist in your user model
         image_paths = ["./src/ex1.jpg", "./src/ex2.jpg", "./src/ex3.jpg"]  # Adjust paths as necessary
         categories = ["category1", "category2", "category3"]
-        likes = [0, 0, 0]
         
         for i in range(3):
             # Open the image file in binary mode
@@ -86,9 +85,6 @@ class DummyBoardView(APIView):
                     category=categories[i]
                 )
                 board.save()
-                
-                like = Likes(user=User.objects.get(id=authors[i]), board=board)
-                like.save()
                 
                 if i == 2:
                     img = Images(board=board, image=File(img_file))
