@@ -74,6 +74,7 @@ class DummyBoardView(APIView):
         authors = [1, 2, 3]  # Assuming these user IDs exist in your user model
         image_paths = ["./src/ex1.jpg", "./src/ex2.jpg", "./src/ex3.jpg"]  # Adjust paths as necessary
         categories = ["category1", "category2", "category3"]
+        prices = [1000, 2000, 3000]
         
         for i in range(3):
             # Open the image file in binary mode
@@ -82,7 +83,8 @@ class DummyBoardView(APIView):
                     title=titles[i],
                     content=contents[i],
                     author=User.objects.get(id=authors[i]),
-                    category=categories[i]
+                    category=categories[i],
+                    price=prices[i]
                 )
                 board.save()
                 
