@@ -14,8 +14,8 @@ class Board(models.Model):
         ordering = ("-created_at",)
         
 class Likes(models.Model):
-    user = models.ForeignKey("user.User", on_delete=models.CASCADE)
     board = models.ForeignKey(Board, related_name = 'likes', on_delete=models.CASCADE)
+    user = models.ForeignKey("user.User", on_delete=models.CASCADE)
     
     class Meta:
         unique_together = ("user", "board")

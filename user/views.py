@@ -126,23 +126,27 @@ def access_token_return(access_token, user):
 class ClosetView(APIView):
     permission_classes = [AllowAny]
     
-    def get(self, request, id=None):
-        if id:
-            try:
-                closet = Closet.objects.get(id=id)
-                serializer = ClosetSerializer(closet)
-            except Closet.DoesNotExist:
-                return Response({"message": "Closet not found"}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            closets = Closet.objects.all()
-            serializer = ClosetSerializer(closets, many=True)
+    def get(self, request, id):
+        try:
+            user = User.objects.get(id=id)
+            closets = Closet.objects.filter(user=user)  # Get all closets for the user
+            serializer = ClosetSerializer(closets, many=True)  # Serialize them
+        except User.DoesNotExist:
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Closet.DoesNotExist:  # This except block is now redundant since filter won't raise DoesNotExist
+            return Response({"message": "Closet not found"}, status=status.HTTP_404_NOT_FOUND)
         
         return Response(serializer.data)
     
-    def post(self, request):
+    def post(self, request, id):
+        try:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
         serializer = ClosetSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user=user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -167,6 +171,9 @@ class ClosetView(APIView):
         closet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+
+    
 class LevelView(APIView):
     permission_classes = [AllowAny]
     
