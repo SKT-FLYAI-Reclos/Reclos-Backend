@@ -141,6 +141,16 @@ class ClosetView(APIView):
     def post(self, request, id):
         try:
             user = User.objects.get(id=id)
+            
+            access_token = request.headers.get("Authorization")
+            if access_token.startswith("Bearer "):
+                access_token = access_token.split("Bearer ")[1]
+            if not access_token:
+                return Response({"error": "No access token provided"}, status=status.HTTP_400_BAD_REQUEST)
+            payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
+            if user.id != payload["user_id"]:
+                return Response({"error": "Invalid access token"}, status=status.HTTP_400_BAD_REQUEST)
+
         except User.DoesNotExist:
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         
