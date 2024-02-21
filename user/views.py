@@ -9,8 +9,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
-from .models import User
-from .serializers import UserSerializer
+from .models import User, Level, Closet
+from .serializers import UserSerializer, LevelSerializer, ClosetSerializer
 
 import requests
 import jwt
@@ -123,6 +123,78 @@ def access_token_return(access_token, user):
         }
     )
 
+class ClosetView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request, id=None):
+        if id:
+            try:
+                closet = Closet.objects.get(id=id)
+                serializer = ClosetSerializer(closet)
+            except Closet.DoesNotExist:
+                return Response({"message": "Closet not found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            closets = Closet.objects.all()
+            serializer = ClosetSerializer(closets, many=True)
+        
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = ClosetSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def update(self, request, id):
+        try:
+            closet = Closet.objects.get(id=id)
+        except Closet.DoesNotExist:
+            return Response({"message": "Closet not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = ClosetSerializer(closet, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, id):
+        try:
+            closet = Closet.objects.get(id=id)
+        except Closet.DoesNotExist:
+            return Response({"message": "Closet not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        closet.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class LevelView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request, id=None):
+        if id:
+            try:
+                level = Level.objects.get(id=id)
+                serializer = LevelSerializer(level)
+            except Level.DoesNotExist:
+                return Response({"message": "Level not found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            levels = Level.objects.all()
+            serializer = LevelSerializer(levels, many=True)
+        
+        return Response(serializer.data)
+    
+    def update(self, request, id):
+        try:
+            level = Level.objects.get(id=id)
+        except Level.DoesNotExist:
+            return Response({"message": "Level not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = LevelSerializer(level, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 class DummyDataView(APIView):
     permission_classes = [AllowAny]
@@ -130,11 +202,25 @@ class DummyDataView(APIView):
     def get(self, request):
         usernames = ["DummyUser1", "DummyUser2", "DummyUser3", "DummyUser4", "DummyUser5"]
         passwords = ["password1", "password2", "password3", "password4", "password5"]
+        closet_categories = ["upper", "bottom", "dress"]
+        
         for i in range(5):
             user, created = User.objects.get_or_create(username=usernames[i])
             if created:
                 user.set_password(passwords[i])
                 user.save()
+                
+                Level.objects.create(user=user, manner_level=0, water_level=0, tree_level=0)
+                
         
         return Response({"message": "User Dummy data created"}, status=status.HTTP_200_OK)
         
+class DeleteAllDataView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        User.objects.all().delete()
+        Closet.objects.all().delete()
+        Level.objects.all().delete()
+        
+        return Response({"message": "All data deleted"}, status=status.HTTP_200_OK)

@@ -47,3 +47,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_staff(self):
         return self.is_admin
+
+class Closet(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="", null = False, blank = False)
+    category = models.CharField(max_length=100)
+
+class Level(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    manner_level = models.IntegerField(default=0, null = False, blank = False)
+    water_level = models.IntegerField(default=0, null = False, blank = False)
+    tree_level = models.IntegerField(default=0, null = False, blank = False)
