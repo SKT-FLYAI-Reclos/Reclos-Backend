@@ -43,7 +43,7 @@ class BoardView(APIView):
             
             images = request.FILES.getlist("images")
             for img in images:
-                Images.objects.create(board=board, image=img)
+                Image.objects.create(board=board, image=img)
                 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -75,7 +75,7 @@ class ToggleLikeView(APIView):
         except Board.DoesNotExist:
             return Response({"message": "no board"}, status=status.HTTP_404_NOT_FOUND)
         
-        like, created = Likes.objects.get_or_create(user=request.user, board=board)
+        like, created = Like.objects.get_or_create(user=request.user, board=board)
         if not created:
             like.delete()
             return Response({"message": "unliked"})
@@ -106,13 +106,13 @@ class DummyBoardView(APIView):
                 board.save()
                 
                 if i == 2:
-                    img = Images(board=board, image=File(img_file))
-                    more_img = Images(board=board, image=File(img_file))
+                    img = Image(board=board, image=File(img_file))
+                    more_img = Image(board=board, image=File(img_file))
                     img.save()
                     more_img.save()
                 
                 else:
-                    img = Images(board=board, image=File(img_file))
+                    img = Image(board=board, image=File(img_file))
                     img.save()
             
         return Response({"message": "Dummy boards created successfully"})
