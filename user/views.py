@@ -48,28 +48,27 @@ class KakaoLoginView(APIView):
         if not code:
             return Response({"error": "Code not provided"}, status=status.HTTP_400_BAD_REQUEST)
         
+        redirect_uri = request.GET.get('redirect_uri')
+        if not redirect_uri:
+            return Response({"error": "Redirect URI not provided"}, status=status.HTTP_400_BAD_REQUEST)
+        
         # Exchange the code for a token
-        redirect_uris = [uri.strip() for uri in os.getenv("KAKAO_REDIRECT_URI").split(",")]
-        for redirect_uri in redirect_uris:
-            token_request = requests.post(
-                "https://kauth.kakao.com/oauth/token",
-                data={
-                    "grant_type": "authorization_code",
-                    "client_id": os.getenv("KAKAO_REST_API_KEY"),
-                    "redirect_uri": redirect_uri,
-                    "code": code,
-                },
-            )
-            print(token_request.request.body)
-            token_response_json = token_request.json()
-            print(token_response_json)
-            if 'error' in token_response_json:
-                continue
-            else:
-                break
+        token_request = requests.post(
+            "https://kauth.kakao.com/oauth/token",
+            data={
+                "grant_type": "authorization_code",
+                "client_id": os.getenv("KAKAO_REST_API_KEY"),
+                "redirect_uri": redirect_uri,
+                "code": code,
+            },
+        )
+        token_response_json = token_request.json()
+        print(token_request.request.body)
+        print(token_response_json)
         
         if 'error' in token_response_json:
             return Response(token_response_json, status=status.HTTP_400_BAD_REQUEST)
+        
         access_token = token_response_json.get("access_token")
 
         # Use the access token to get the user's info from Kakao
