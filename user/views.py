@@ -49,19 +49,25 @@ class KakaoLoginView(APIView):
             return Response({"error": "Code not provided"}, status=status.HTTP_400_BAD_REQUEST)
         
         # Exchange the code for a token
-        token_request = requests.post(
-            "https://kauth.kakao.com/oauth/token",
-            data={
-                "grant_type": "authorization_code",
-                "client_id": os.getenv("KAKAO_REST_API_KEY"),
-                "redirect_uri": "http://localhost:3000/login/kakao-callback",
-                "code": code,
-            },
-        )
-        token_response_json = token_request.json()
+        redirect_uris = os.getenv("KAKAO_REDIRECT_URI")
+        for redirect_uri in redirect_uris.split(","):
+            token_request = requests.post(
+                "https://kauth.kakao.com/oauth/token",
+                data={
+                    "grant_type": "authorization_code",
+                    "client_id": os.getenv("KAKAO_REST_API_KEY"),
+                    "redirect_uri": redirect_uri,
+                    "code": code,
+                },
+            )
+            token_response_json = token_request.json()
+            if 'error' in token_response_json:
+                continue
+            else:
+                break
+        
         if 'error' in token_response_json:
             return Response(token_response_json, status=status.HTTP_400_BAD_REQUEST)
-
         access_token = token_response_json.get("access_token")
 
         # Use the access token to get the user's info from Kakao
@@ -86,7 +92,6 @@ class UserMyView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        print(request.headers)
         access_token = request.headers.get("Authorization")
         if access_token.startswith("Bearer "):
             access_token = access_token.split("Bearer ")[1]
