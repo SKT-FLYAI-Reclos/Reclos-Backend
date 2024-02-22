@@ -21,7 +21,7 @@ class BoardView(APIView):
     
     def get_single_board(self, id):
         try:
-            board = Board.objects.prefetch_related("images", "likes").get(id=id)
+            board = Board.objects.prefetch_related("image", "like").get(id=id)
             serializer = BoardSerializer(board)
             return Response(serializer.data)
         except Board.DoesNotExist:
@@ -29,7 +29,7 @@ class BoardView(APIView):
 
     def get_boards_by_category(self, request):
         category = request.query_params.get("category")
-        boards = Board.objects.all().prefetch_related("images", "likes")
+        boards = Board.objects.all().prefetch_related("image", "like")
         if category:
             boards = boards.filter(category=category)
         
@@ -41,7 +41,7 @@ class BoardView(APIView):
         if serializer.is_valid():
             board = serializer.save(author=request.user)
             
-            images = request.FILES.getlist("images")
+            images = request.FILES.getlist("image")
             for img in images:
                 Image.objects.create(board=board, image=img)
                 

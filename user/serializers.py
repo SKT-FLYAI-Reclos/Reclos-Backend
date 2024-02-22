@@ -12,7 +12,7 @@ class LevelSerializer(serializers.ModelSerializer):
         exclude = ["id", "user"]
 
 class UserSerializer(serializers.ModelSerializer):
-    closets = serializers.SerializerMethodField()
+    closet = serializers.SerializerMethodField()
     level = serializers.SerializerMethodField()
 
     class Meta:
@@ -20,9 +20,9 @@ class UserSerializer(serializers.ModelSerializer):
         fields = "__all__"
         extra_kwargs = {"password": {"write_only": True}}
     
-    def get_closets(self, obj):
-        closets = Closet.objects.filter(user=obj)
-        return ClosetSerializer(closets, many=True).data
+    def get_closet(self, obj):
+        closet = Closet.objects.filter(user=obj)
+        return ClosetSerializer(closet, many=True).data
     
     def get_level(self, obj):
         level = Level.objects.filter(user=obj)
