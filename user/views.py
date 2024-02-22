@@ -60,7 +60,7 @@ class KakaoLoginView(APIView):
                     "code": code,
                 },
             )
-            print(token_request.data)
+            print(token_request.request.body)
             token_response_json = token_request.json()
             if 'error' in token_response_json:
                 continue
