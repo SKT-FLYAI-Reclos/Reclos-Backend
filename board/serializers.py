@@ -14,16 +14,16 @@ class LikeSerializer(serializers.ModelSerializer):
 
 class BoardSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
-    image = serializers.SerializerMethodField()
-    like = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField()
+    likes = serializers.SerializerMethodField()
     
     class Meta:
         model = Board
         fields = "__all__"
     
-    def get_image(self, obj):
-        images = obj.image.all()
+    def get_images(self, obj):
+        images = obj.images.all()
         return ImageSerializer(images, many=True).data
     
-    def get_like(self, obj):
-        return [like.user.username for like in obj.like.all()]
+    def get_likes(self, obj):
+        return [like.user.username for like in obj.likes.all()]
