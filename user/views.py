@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
@@ -125,6 +126,7 @@ def access_token_return(access_token, user):
 
 class ClosetView(APIView):
     permission_classes = [AllowAny]
+    parser_classes = [MultiPartParser, FormParser]
     
     def get(self, request, id):
         try:
@@ -142,9 +144,7 @@ class ClosetView(APIView):
         try:
             user = User.objects.get(id=id)
             
-            access_token = request.headers.get("Authorization")
-            if access_token.startswith("Bearer "):
-                access_token = access_token.split("Bearer ")[1]
+            access_token = request.headers.get("Authorization", "").split("Bearer ")[-1]
             if not access_token:
                 return Response({"error": "No access token provided"}, status=status.HTTP_400_BAD_REQUEST)
             payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
@@ -156,9 +156,11 @@ class ClosetView(APIView):
         
         serializer = ClosetSerializer(data=request.data)
         if serializer.is_valid():
+            # Assuming your serializer handles the image file correctly
             serializer.save(user=user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def update(self, request, id):
         try:
