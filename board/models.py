@@ -14,13 +14,13 @@ class Board(models.Model):
         ordering = ("-created_at",)
         
 class Like(models.Model):
-    board = models.ForeignKey(Board, related_name = 'likes', on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, related_name = 'like', on_delete=models.CASCADE)
     user = models.ForeignKey("user.User", on_delete=models.CASCADE)
     
     class Meta:
         unique_together = ("user", "board")
 
 class Image(models.Model):
-    board = models.ForeignKey(Board, related_name = 'images', on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, related_name = 'image', on_delete=models.CASCADE)
     image = models.ImageField(upload_to="", null = False, blank = False)
     kind = models.IntegerField(default=0, null=False, blank=False)  # 0 : original, 1 : generated, 2 : fitted
