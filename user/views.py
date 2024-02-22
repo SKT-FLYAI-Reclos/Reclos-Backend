@@ -122,7 +122,6 @@ def refresh_token_return(refresh, user):
 def access_token_return(access_token, user):
     return Response(
         {
-            "refresh": str(RefreshToken.for_user(user)),
             "access": str(access_token),
             "user": {
                 "pk": user.pk,
