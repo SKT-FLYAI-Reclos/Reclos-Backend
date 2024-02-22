@@ -51,7 +51,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Closet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to="", null = False, blank = False)
-    category = models.CharField(max_length=100)
+    cloth_type = models.CharField(max_length=100)                         # string으로 front에서 처리
 
 class Level(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

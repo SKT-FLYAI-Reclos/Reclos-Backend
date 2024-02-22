@@ -11,7 +11,8 @@ urlpatterns = [
     path("my/", UserMyView.as_view()),
     path("kakao/login/", KakaoLoginView.as_view()),
     path("signup/", include("dj_rest_auth.registration.urls")),
-    path("level/", LevelView.as_view()),
+    
+    path("<int:id>/level/", LevelView.as_view()),
     path("<int:id>/closet/", ClosetView.as_view()),
     
     path("dummy/", DummyDataView.as_view()),

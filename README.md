@@ -28,6 +28,7 @@ python manage.py runserver
 
 # API Reference
 
+
 ## User
 
 ### Get User(s)
@@ -89,7 +90,7 @@ Allows an authenticated user to change their password.
 POST /api/user/password/reset/
 ```
 
-Initiates a password reset process for a user. (Not working)
+Initiates a password reset process for a user.
 
 | Parameter  | Type     | Description                           |
 |------------|----------|---------------------------------------|
@@ -149,7 +150,6 @@ Obtains a new access token using a refresh token.
 |-----------|----------|--------------------------------|
 | `refresh` | `string` | **Required**. Refresh token    |
 
-
 ### Initiate Kakao Login
 
 To start the Kakao login process, direct the user to the following URL:
@@ -175,6 +175,86 @@ This endpoint on your server should handle the code exchange for an access token
 | `code`    | `string` | **Required**. Code provided by Kakao after user login |
 
 On success, this endpoint returns JWT tokens (`access` and `refresh`) along with the user's basic information.
+
+
+### Get User Level
+
+```http
+GET /api/user/<int:id>/level/
+```
+
+Retrieves the level information of a specific user by their ID. This endpoint does not require authentication, allowing any user to view a specific user's level details.
+
+| Parameter | Type     | Description                            |
+|-----------|----------|----------------------------------------|
+| `id`      | `int`    | **Required**. The ID of the user whose level information is to be retrieved. |
+
+### Update User Level
+
+```http
+PUT /api/user/<int:id>/level/
+```
+
+Updates the level information for a specific user. This endpoint requires authentication and that the requester is the user whose level is being updated.
+
+| Parameter     | Type     | Description                          |
+|---------------|----------|--------------------------------------|
+| `id`          | `int`    | **Required**. The ID of the user whose level is to be updated. |
+| `manner_level`| `int`    | Optional. The new manner level of the user. |
+| `water_level` | `int`    | Optional. The new water level of the user. |
+| `tree_level`  | `int`    | Optional. The new tree level of the user. |
+
+### Get User Closet
+
+```http
+GET /api/user/<int:id>/closet/
+```
+
+Retrieves all closet items of a specific user by their ID. This endpoint does not require authentication, allowing any user to view a specific user's closet items.
+
+| Parameter | Type     | Description                            |
+|-----------|----------|----------------------------------------|
+| `id`      | `int`    | **Required**. The ID of the user whose closet items are to be retrieved. |
+
+### Add Closet Item
+
+```http
+POST /api/user/<int:id>/closet/
+```
+
+Allows a user to add a new item to their closet. This endpoint requires authentication and that the requester is the user adding the closet item.
+
+| Parameter | Type     | Description                            |
+|-----------|----------|----------------------------------------|
+| `id`      | `int`    | **Required**. The ID of the user adding a new closet item. |
+| `image`   | `file`   | **Required**. The image file of the closet item. |
+| `cloth_type` | `string` | **Required**. The type of the clothing item. |
+
+### Update Closet Item
+
+```http
+PUT /api/user/<int:id>/closet/<int:closet_id>/
+```
+
+Updates a specific closet item for a user. This endpoint requires authentication and that the requester is the user updating the closet item.
+
+| Parameter   | Type     | Description                                    |
+|-------------|----------|------------------------------------------------|
+| `id`        | `int`    | **Required**. The ID of the user.              |
+| `closet_id` | `int`    | **Required**. The ID of the closet item to update. |
+
+### Delete Closet Item
+
+```http
+DELETE /api/user/<int:id>/closet/<int:closet_id>/
+```
+
+Allows a user to delete a specific item from their closet. This endpoint requires authentication and that the requester is the user deleting the closet item.
+
+| Parameter   | Type     | Description                                    |
+|-------------|----------|------------------------------------------------|
+| `id`        | `int`    | **Required**. The ID of the user.              |
+| `closet_id` | `int`    | **Required**. The ID of the closet item to delete. |
 
 ### Dummy User
     
@@ -220,9 +300,9 @@ Allows an authenticated user to create a new board. This endpoint requires authe
 | `title`    | `string` | **Required**. The title of the board. |
 | `content`  | `string` | **Required**. The content of the board. |
 | `category` | `string` | Optional. The category of the board. |
-| `images`    | `file`   | Optional. image files to upload. |
+| `images`   | `file`   | Optional. Image files to upload. |
 
-To post a board with an image, ensure the request's `Content-Type` is set to `multipart/form-data`.
+To post a board with images, ensure the request's `Content-Type` is set to `multipart/form-data`.
 
 ### Delete a Specific Board
 
@@ -238,15 +318,13 @@ Allows the author of a board to delete it. This endpoint requires authentication
 
 Upon successful deletion, the server responds with a `204 No Content` status code, indicating that the operation was successful but there is no content to return.
 
-
 ### Like a Board
 
 ```http
 POST /api/board/<int:id>/like/
 ```
 
-Allows an user like a board, this endpoint toggles the like status of the board.
-
+Allows a user to like a board. This endpoint toggles the like status of the board. If the user has already liked the board, the like will be removed (unliked), and if not, a like will be added.
 
 ### Dummy Board
 
@@ -254,4 +332,4 @@ Allows an user like a board, this endpoint toggles the like status of the board.
 GET /api/board/dummy/
 ```
 
-Creates a dummy board for testing purposes.
+Creates dummy board data for testing purposes. 

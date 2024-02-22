@@ -14,18 +14,27 @@ class BoardView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request, id=None):
-        if id is None:
-            boards = Board.objects.all().prefetch_related("images", "likes")
-            serializer = BoardSerializer(boards, many=True)
-            return Response(serializer.data)
+        if id:
+            return self.get_single_board(id)
         else:
-            try:
-                board = Board.objects.prefetch_related("images", "likes").get(id=id)
-            except Board.DoesNotExist:
-                return Response({"message": "no board"}, status=status.HTTP_404_NOT_FOUND)
-            
+            return self.get_boards_by_category(request)
+    
+    def get_single_board(self, id):
+        try:
+            board = Board.objects.prefetch_related("images", "likes").get(id=id)
             serializer = BoardSerializer(board)
             return Response(serializer.data)
+        except Board.DoesNotExist:
+            return Response({"message": "no board"}, status=status.HTTP_404_NOT_FOUND)
+
+    def get_boards_by_category(self, request):
+        category = request.query_params.get("category")
+        boards = Board.objects.all().prefetch_related("images", "likes")
+        if category:
+            boards = boards.filter(category=category)
+        
+        serializer = BoardSerializer(boards, many=True)
+        return Response(serializer.data)
 
     def post(self, request):
         serializer = BoardSerializer(data=request.data)
@@ -51,6 +60,14 @@ class BoardView(APIView):
 
 class ToggleLikeView(APIView):
     permission_classes = [AllowAny]
+    def get(self, request, id):
+        try:
+            board = Board.objects.get(id=id)
+        except Board.DoesNotExist:
+            return Response({"message": "no board"}, status=status.HTTP_404_NOT_FOUND)
+        
+        likes = board.likes.all()
+        return Response({"likes": len(likes)})
     
     def post(self, request, id):
         try:

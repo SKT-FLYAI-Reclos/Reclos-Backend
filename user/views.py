@@ -181,28 +181,28 @@ class ClosetView(APIView):
         closet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
-
     
 class LevelView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request, id=None):
-        if id:
-            try:
-                level = Level.objects.get(id=id)
-                serializer = LevelSerializer(level)
-            except Level.DoesNotExist:
-                return Response({"message": "Level not found"}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            levels = Level.objects.all()
-            serializer = LevelSerializer(levels, many=True)
+        try:
+            user = User.objects.get(id=id)
+            level = Level.objects.get(user=user)
+            serializer = LevelSerializer(level)
+        except User.DoesNotExist:
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Level.DoesNotExist:
+            return Response({"message": "Level not found"}, status=status.HTTP_404_NOT_FOUND)
         
         return Response(serializer.data)
     
     def update(self, request, id):
         try:
-            level = Level.objects.get(id=id)
+            user = User.objects.get(id=id)
+            level = Level.objects.get(user=user)
+        except User.DoesNotExist:
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         except Level.DoesNotExist:
             return Response({"message": "Level not found"}, status=status.HTTP_404_NOT_FOUND)
         

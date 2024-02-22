@@ -1,9 +1,7 @@
 # board
-카테고리 별 정렬
 
 # token
 테스트코드(더미 데이터) 추가
-github action
 
 # image gen app 생성
 
@@ -11,3 +9,15 @@ github action
 # ReadMe
 dummy
 
+
+
+##
+
+1. 보정된 사진 formdata로 받으면 200 ok
+- /img/correction
+
+6. 피팅모델에게 내 옷 입히기
+- 
+request body:
+원본 이미지 url - string
+입힐 이미지 url - string
