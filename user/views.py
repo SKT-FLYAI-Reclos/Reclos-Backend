@@ -49,8 +49,8 @@ class KakaoLoginView(APIView):
             return Response({"error": "Code not provided"}, status=status.HTTP_400_BAD_REQUEST)
         
         # Exchange the code for a token
-        redirect_uris = os.getenv("KAKAO_REDIRECT_URI")
-        for redirect_uri in redirect_uris.split(","):
+        redirect_uris = [uri.strip() for uri in os.getenv("KAKAO_REDIRECT_URI").split(",")]
+        for redirect_uri in redirect_uris:
             token_request = requests.post(
                 "https://kauth.kakao.com/oauth/token",
                 data={
