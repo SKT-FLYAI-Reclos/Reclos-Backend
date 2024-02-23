@@ -93,6 +93,7 @@ class UserMyView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
+        print(request.headers)
         access_token = request.headers.get("Authorization")
         if access_token.startswith("Bearer "):
             access_token = access_token.split("Bearer ")[1]
