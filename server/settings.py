@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     
     "user",
     "board",
+    "imgen",
     
     # rest_framework
     "rest_framework",
