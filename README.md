@@ -333,3 +333,28 @@ GET /api/board/dummy/
 ```
 
 Creates dummy board data for testing purposes. 
+
+
+## Imgen
+
+### AI server initialization
+
+```http
+get /api/imgen/init/
+```
+
+### ImageBackgroundRemove
+
+```http
+get /api/imgen/rmbg/
+```
+
+Show all background remove images
+
+### ImageBackgroundRemove
+
+```http
+post /api/imgen/rmbg/
+```
+
+Remove background from image, needs bearer token, image file in form-data
