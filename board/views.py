@@ -75,7 +75,7 @@ class ToggleLikeView(APIView):
         except Board.DoesNotExist:
             return Response({"message": "no board"}, status=status.HTTP_404_NOT_FOUND)
         
-        like, created = Like.objects.get_or_create(user=request.user, board=board)
+        like, created = Like.objects.get_or_create(user=request.user.id, board=board)
         if not created:
             like.delete()
             return Response({"message": "unliked"})
