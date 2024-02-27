@@ -45,7 +45,9 @@ class BoardView(APIView):
             image_files = request.FILES.getlist("image")
             all_images = request.data.getlist("image")  # This will include both URLs and files
             kinds = request.data.getlist("kind")
-
+            
+            print(image_files, all_images, kinds)
+            
             # Separate URLs from file names in the all_images list
             image_urls = [img for img in all_images if isinstance(img, str) and img.startswith('http')]
 
