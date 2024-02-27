@@ -42,7 +42,7 @@ class BoardView(APIView):
             board = serializer.save(author=request.user)
             images = request.FILES.getlist("image")
             kinds = request.data.getlist("kind")
-            print(images, kinds)
+            print(request.FILES, request.data, images, kinds)
             for img in images:
                 Image.objects.create(board=board, image=img, kind=kinds.pop(0))
                 
