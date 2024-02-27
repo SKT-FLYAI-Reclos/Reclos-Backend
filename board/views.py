@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.core.files import File
+from django.core.files.base import ContentFile
+import requests
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -40,12 +42,21 @@ class BoardView(APIView):
         serializer = BoardSerializer(data=request.data)
         if serializer.is_valid():
             board = serializer.save(author=request.user)
-            images = request.data.getlist("image")
+            image_files = request.FILES.getlist("image")
+            image_urls = request.data.getlist("image")
             kinds = request.data.getlist("kind")
-            print(request.FILES, request.data, images, kinds)
-            for img in images:
+
+            for img in image_files:
                 Image.objects.create(board=board, image=img, kind=kinds.pop(0))
-                
+
+            for img_url in image_urls:
+                if img_url.startswith('http'):
+                    response = requests.get(img_url)
+                    if response.status_code == 200:
+                        img_name = img_url.split('/')[-1]
+                        img_temp = ContentFile(response.content, name=img_name)
+                        Image.objects.create(board=board, image=img_temp, kind=kinds.pop(0))
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
