@@ -106,7 +106,7 @@ class DummyBoardView(APIView):
         titles = ["title1", "title2", "title3"]
         contents = ["content1", "content2", "content3"]
         authors = [1, 2, 3]  # Assuming these user IDs exist in your user model
-        image_paths = ["./src/ex1.jpg", "./src/ex2.jpg", "./src/ex3.jpg"]  # Adjust paths as necessary
+        image_paths = ["./images/ex1.jpg", "./images/ex2.jpg", "./images/ex3.jpg"]  # Adjust paths as necessary
         categories = ["category1", "category2", "category3"]
         prices = [1000, 2000, 3000]
         
