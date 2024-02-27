@@ -358,3 +358,11 @@ post /api/imgen/rmbg/
 ```
 
 Remove background from image, needs bearer token, image file in form-data
+
+### LadiVton
+
+```http
+post /api/imgen/ladivton/
+```
+
+LadiVton, needs bearer token, {uuid[required], category(default:upper_body), reference_count(default:1)}

@@ -86,6 +86,8 @@ class ImageRemoveBackgroundView(views.APIView):
         except Exception as e:
             return Response({'error': 'Image Remove Background failed' + str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+
+# uuid[require], category, reference_count
 class ImageLadiVtonView(views.APIView):
     permission_classes = [AllowAny]
     
@@ -93,9 +95,9 @@ class ImageLadiVtonView(views.APIView):
         unique_id = request.data.get('uuid')
         
         if not unique_id:
-            return Response({'error': 'unique_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'uuid is required'}, status=status.HTTP_400_BAD_REQUEST)
         
-        try:
+        try:       
             # seg
             clothseg_response = requests.post(f'{AI_SERVER_IP}/clothseg', json={'id': unique_id})
             print(f'clothseg_response: {clothseg_response.json()}')
@@ -110,12 +112,21 @@ class ImageLadiVtonView(views.APIView):
             print(f'cluster_response: {cluster_response.json()}')
             
             #LadiVton
-            reference_id = request.data.get('reference_id')
-            reference_id = '000000_0' if reference_id == None else reference_id
-            ladivton_response = requests.post(f'{AI_SERVER_IP}/ladivton', json={'id': unique_id, 'reference_id': reference_id})
-            print(f'ladivton_response: {ladivton_response.json()}')
+            reference_count = request.data.get('reference_count')
+            if not reference_count:
+                reference_count = 1
+                
+            reference_ids = cluster_response.json().get('cluster_id_list')
             
-            return Response(ladivton_response.json(), status=status.HTTP_200_OK)
-        
+            response = []
+            for index in range(reference_count):
+                reference_id = reference_ids[index] + "_0"
+                ladivton_response = requests.post(f'{AI_SERVER_IP}/ladivton', json={'id': unique_id, 'reference_id': reference_id})
+                print(f'ladivton_response: {ladivton_response.json()}')
+                response.append(ladivton_response.json())
+
+            return Response(response, status=status.HTTP_200_OK)
+    
+
         except Exception as e:
-            return Response({'error': 'Image LadiVton failed'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Image LadiVton failed', 'message' : e}, status=status.HTTP_400_BAD_REQUEST)
