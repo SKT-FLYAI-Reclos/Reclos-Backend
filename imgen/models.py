@@ -12,7 +12,7 @@ class ImageRemoveBackground(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
 class ImageLadiVton(models.Model):
-    uuid = models.UUIDField(primary_key=True, unique=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ladi_vton_requests')
     category = models.CharField(max_length=50, null=True, blank=True)
     image = models.ImageField(upload_to='imgen/ladi_vton/')
