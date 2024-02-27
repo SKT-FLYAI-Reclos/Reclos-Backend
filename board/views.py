@@ -43,19 +43,23 @@ class BoardView(APIView):
         if serializer.is_valid():
             board = serializer.save(author=request.user)
             image_files = request.FILES.getlist("image")
-            image_urls = request.data.getlist("image")
+            all_images = request.data.getlist("image")  # This will include both URLs and files
             kinds = request.data.getlist("kind")
 
+            # Separate URLs from file names in the all_images list
+            image_urls = [img for img in all_images if isinstance(img, str) and img.startswith('http')]
+
+            # Handle the uploaded image files
             for img in image_files:
                 Image.objects.create(board=board, image=img, kind=kinds.pop(0))
 
+            # Now, handle the image URLs
             for img_url in image_urls:
-                if img_url.startswith('http'):
-                    response = requests.get(img_url)
-                    if response.status_code == 200:
-                        img_name = img_url.split('/')[-1]
-                        img_temp = ContentFile(response.content, name=img_name)
-                        Image.objects.create(board=board, image=img_temp, kind=kinds.pop(0))
+                response = requests.get(img_url)  # Get the image from the URL
+                if response.status_code == 200:
+                    img_name = img_url.split('/')[-1]  # Extract a simple name from the URL
+                    img_temp = ContentFile(response.content, name=img_name)
+                    Image.objects.create(board=board, image=img_temp, kind=kinds.pop(0))
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
