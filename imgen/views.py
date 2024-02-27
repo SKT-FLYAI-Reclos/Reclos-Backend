@@ -97,6 +97,10 @@ class ImageLadiVtonView(views.APIView):
         if not unique_id:
             return Response({'error': 'uuid is required'}, status=status.HTTP_400_BAD_REQUEST)
         
+        user = request.user.id
+        if not user:
+            return Response({'error': 'user is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
         try:       
             # seg
             clothseg_response = requests.post(f'{AI_SERVER_IP}/clothseg', json={'id': unique_id})
@@ -123,7 +127,32 @@ class ImageLadiVtonView(views.APIView):
                 reference_id = reference_ids[index] + "_0"
                 ladivton_response = requests.post(f'{AI_SERVER_IP}/ladivton', json={'id': unique_id, 'reference_id': reference_id})
                 print(f'ladivton_response: {ladivton_response.json()}')
-                response.append(ladivton_response.json())
+                image_data = ladivton_response.json().get('image')
+                if not image_data:
+                    return Response('No image data', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+                image = PIL.Image.open(io.BytesIO(base64.b64decode(image_data)))
+                img_io = io.BytesIO()
+                image.save(img_io, format='JPEG')
+                image_content = ContentFile(img_io.getvalue(), name=f'{unique_id}.jpg')
+                
+                serializer_data = {
+                    'uuid': unique_id, 
+                    'user': user, 
+                    'category': category, 
+                    'image': image_content,
+                    'status': 'success'
+                    }
+                
+                serializer = ImageLadiVtonSerializer(data=serializer_data)
+                print(serializer_data)
+                
+                if serializer.is_valid():
+                    serializer.save()
+                    response.append(serializer.data)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
 
             return Response(response, status=status.HTTP_200_OK)
     

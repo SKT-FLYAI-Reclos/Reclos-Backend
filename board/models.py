@@ -7,11 +7,14 @@ class Board(models.Model):
     category = models.CharField(max_length=100)
     author = models.ForeignKey("user.User", on_delete=models.CASCADE)
     price = models.IntegerField(default=0, null = False, blank = False)
+    gender = models.CharField(max_length=100, default="not-set")
+    size = models.CharField(max_length=100, default="not-set")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         ordering = ("-created_at",)
+        
         
 class Like(models.Model):
     board = models.ForeignKey(Board, related_name = 'likes', on_delete=models.CASCADE)
@@ -19,8 +22,9 @@ class Like(models.Model):
     
     class Meta:
         unique_together = ("user", "board")
-
+        
+        
 class Image(models.Model):
     board = models.ForeignKey(Board, related_name = 'images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to="", null = False, blank = False)
-    kind = models.IntegerField(default=0, null=False, blank=False)  # 0 : original, 1 : generated, 2 : fitted
+    kind = models.IntegerField(default=0, null=False, blank=False)  # 0 : original, 1 : generated

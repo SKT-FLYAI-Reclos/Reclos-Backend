@@ -40,10 +40,10 @@ class BoardView(APIView):
         serializer = BoardSerializer(data=request.data)
         if serializer.is_valid():
             board = serializer.save(author=request.user)
-            
             images = request.FILES.getlist("image")
+            kinds = request.data.getlist("kind")
             for img in images:
-                Image.objects.create(board=board, image=img)
+                Image.objects.create(board=board, image=img, kind=kinds.pop(0))
                 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -80,6 +80,23 @@ class ToggleLikeView(APIView):
             like.delete()
             return Response({"message": "unliked"})
         return Response({"message": "liked"})
+
+
+class MyLikeView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request):
+        likes = Like.objects.filter(user=request.user)
+        boards = [like.board for like in likes]
+        serializer = BoardSerializer(boards, many=True)
+        return Response(serializer.data)
+    
+class MyLikeByIdView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, id):
+        likes = Like.objects.filter(user=request.user, board__id=id)
+        if likes:
+            return Response({"liked": True})
+        return Response({"liked": False})
 
 
 class DummyBoardView(APIView):
