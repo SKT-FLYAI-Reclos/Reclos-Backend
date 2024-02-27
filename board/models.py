@@ -27,4 +27,4 @@ class Like(models.Model):
 class Image(models.Model):
     board = models.ForeignKey(Board, related_name = 'images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to="", null = False, blank = False)
-    kind = models.IntegerField(default=0, null=False, blank=False)  # 0 : original, 1 : generated
+    kind = models.CharField(max_length=100, null = False, blank = False)
