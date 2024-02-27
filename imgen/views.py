@@ -91,6 +91,10 @@ class ImageRemoveBackgroundView(views.APIView):
 class ImageLadiVtonView(views.APIView):
     permission_classes = [AllowAny]
     
+    def get(self, request):
+        serializer = ImageLadiVtonSerializer(ImageLadiVton.objects.all(), many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
     def post(self, request):
         unique_id = request.data.get('uuid')
         
