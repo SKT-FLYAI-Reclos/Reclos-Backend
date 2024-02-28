@@ -133,6 +133,7 @@ class ImageLadiVtonView(views.APIView):
             ladivton_response = requests.post(f'{AI_SERVER_IP}/ladivton', json={'id': unique_id, 'reference_id': reference_id, 'index':index})
             # print(f'ladivton_response: {ladivton_response.json()}')
             image_data = ladivton_response.json().get('image')
+            referene_id = ladivton_response.json().get('reference_id')
             
             """ if not image_data:
                 print('No image data')
@@ -148,6 +149,7 @@ class ImageLadiVtonView(views.APIView):
                 'user': user, 
                 'category': category, 
                 'image': image_content,
+                'reference_id': referene_id,
                 'status': 'success'
                 }
             
@@ -167,3 +169,30 @@ class ImageLadiVtonView(views.APIView):
 
         """except Exception as e:
             return Response({'error': 'Image LadiVton failed', 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)"""
+
+
+class ImageLadiVtonByReferenceIdView(views.APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        user = request.user.id
+        if not user:
+            return Response({'error': 'user is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        image = request.data.get('image')
+        if not image:
+            return Response({'error': 'image is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        reference_id = request.data.get('reference_id')
+        if not reference_id:
+            return Response({'error': 'reference_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        unique_id = image.name.split('/')[-1].split('.')[0]
+        print(f'unique_id from image ladivton by reference_id: {unique_id}')
+        
+        request_data = {
+            'id': unique_id,
+            'reference_id': reference_id
+        }
+        
+        return Response(ImageLadiVtonView().post(request_data), status=status.HTTP_200_OK)

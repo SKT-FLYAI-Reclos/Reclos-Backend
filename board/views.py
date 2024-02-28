@@ -47,6 +47,7 @@ class BoardView(APIView):
             image_files = request.FILES.getlist("image")
             all_images = request.data.getlist("image")  # This will include both URLs and files
             kinds = request.data.getlist("kind")
+            reference_ids = request.data.getlist("reference_id")
             
             print(image_files, all_images, kinds)
             
@@ -55,7 +56,10 @@ class BoardView(APIView):
 
             # Handle the uploaded image files
             for img in image_files:
-                Image.objects.create(board=board, image=img, kind=kinds.pop(0))
+                reference_id = reference_ids.pop(0)
+                if reference_id == "":
+                    reference_id = None
+                Image.objects.create(board=board, image=img, kind=kinds.pop(0), reference_id=reference_id)
 
             # Now, handle the image URLs
             for img_url in image_urls:

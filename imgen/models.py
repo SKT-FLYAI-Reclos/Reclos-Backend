@@ -17,5 +17,6 @@ class ImageLadiVton(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ladi_vton_requests')
     category = models.CharField(max_length=50, null=True, blank=True)
     image = models.ImageField(upload_to='imgen/ladi_vton/')
+    reference_id = models.CharField(max_length=50, null=True, blank=True)
     status = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
