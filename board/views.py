@@ -55,10 +55,8 @@ class BoardView(APIView):
             image_urls = [img for img in all_images if isinstance(img, str) and img.startswith('http')]
 
             # Handle the uploaded image files
-            for img in image_files:
-                reference_id = reference_ids.pop(0)
-                print(f'reference_id: {reference_id}')
-                Image.objects.create(board=board, image=img, kind=kinds.pop(0), reference_id=reference_id)
+            for i in range(len(all_images)):
+                Image.objects.create(board=board, image=image_files.pop(0), kind=kinds[i], reference_id=reference_ids[i])
 
             # Now, handle the image URLs
             for img_url in image_urls:
