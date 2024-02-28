@@ -176,14 +176,14 @@ class ClosetView(APIView):
         img_temp.write(image_request.content)
         img_temp.flush()
         
-        request.data["image"] = ContentFile(image_request.content, name=f"{uuid}.jpg")
+        image = ContentFile(image_request.content, name=f"{uuid}.jpg")
         img_temp.close()
         
         serializer = ClosetSerializer(data=request.data)
         if serializer.is_valid():
             # Assuming your serializer handles the image file correctly
             serializer.save(user=user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data(image = image), status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
