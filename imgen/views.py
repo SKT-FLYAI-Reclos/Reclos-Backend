@@ -191,9 +191,61 @@ class ImageLadiVtonByReferenceIdView(views.APIView):
         unique_id = image.split("/")[-1].split(".")[0]
         print(f'unique_id from image ladivton by reference_id: {unique_id}')
         
-        request_data = {
-            'id': unique_id,
-            'reference_id': reference_id
-        }
+        # try:       
+        # seg
+        clothseg_response = requests.post(f'{AI_SERVER_IP}/clothseg', json={'id': unique_id})
+        # print(f'clothseg_response: {clothseg_response.json()}')
         
-        return Response(ImageLadiVtonView().post(request_data), status=status.HTTP_200_OK)
+        #cluster
+        category = request.data.get('category')
+        category = 'upper_body' if category == None else category
+        if category not in ['upper_body', 'lower_body', 'dresses']:
+            return Response({'error': 'category is invalid'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        cluster_response = requests.post(f'{AI_SERVER_IP}/cluster', json={'id': unique_id, 'category' : category})
+        # print(f'cluster_response: {cluster_response.json()}')
+        
+        #LadiVton
+        reference_count = request.data.get('reference_count')
+        if not reference_count:
+            reference_count = 1
+            
+        reference_ids = cluster_response.json().get('cluster_id_list')
+        
+        response = []
+        for index in range(reference_count):
+            reference_id = reference_ids[index] + "_0"
+            ladivton_response = requests.post(f'{AI_SERVER_IP}/ladivton', json={'id': unique_id, 'reference_id': reference_id, 'index':index})
+            # print(f'ladivton_response: {ladivton_response.json()}')
+            image_data = ladivton_response.json().get('image')
+            referene_id = ladivton_response.json().get('reference_id')
+            
+            """ if not image_data:
+                print('No image data')
+                return Response('No image data', status=status.HTTP_500_INTERNAL_SERVER_ERROR)"""
+            
+            image = PIL.Image.open(io.BytesIO(base64.b64decode(image_data)))
+            img_io = io.BytesIO()
+            image.save(img_io, format='JPEG')
+            image_content = ContentFile(img_io.getvalue(), name=f'{unique_id}_{index}.jpg')
+            
+            serializer_data = {
+                'uuid': unique_id, 
+                'user': user, 
+                'category': category, 
+                'image': image_content,
+                'reference_id': referene_id,
+                'status': 'success'
+                }
+            
+            serializer = ImageLadiVtonSerializer(data=serializer_data)
+            
+            if serializer.is_valid():
+                serializer.save()
+                response.append(serializer.data)
+                
+            """else:
+                return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)"""
+            
+        print(f'response : {response}')
+        return Response(response, status=status.HTTP_200_OK)
