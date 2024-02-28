@@ -151,8 +151,8 @@ class ClosetView(APIView):
         try:
             user = User.objects.get(id=id)
             image = request.data.get("image")
-            image = image.split("/")[-1].split(".")[0]
-            print(f'user cloth uuid from image url : {image}')
+            uuid = image.split("/")[-1].split(".")[0]
+            print(f'user cloth uuid from image url : {uuid}')
             
             access_token = request.headers.get("Authorization", "").split("Bearer ")[-1]
             if not access_token:
