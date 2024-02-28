@@ -173,7 +173,7 @@ class ClosetView(APIView):
         if serializer.is_valid():
             # Assuming your serializer handles the image file correctly
             serializer.save(user=user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data(image_url = image), status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
