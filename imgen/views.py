@@ -113,10 +113,10 @@ class ImageLadiVtonView(views.APIView):
         
         #cluster
         category = request.data.get('category')
+        print(f'ladivton category: {category}')
         category = 'upper_body' if category == None else category
         if category not in ['upper_body', 'lower_body', 'dresses']:
             return Response({'error': 'category is invalid'}, status=status.HTTP_400_BAD_REQUEST)
-        print(f'category: {category}')
         
         cluster_response = requests.post(f'{AI_SERVER_IP}/cluster', json={'id': unique_id, 'category' : category})
         # print(f'cluster_response: {cluster_response.json()}')
@@ -199,7 +199,8 @@ class ImageLadiVtonByReferenceIdView(views.APIView):
         
         #cluster
         category = request.data.get('category')
-        category = 'upper_body' if category == None else category
+        print(f'ladivton by reference_id category: {category}')
+        category = 'lower_body' if category == None else category
         if category not in ['upper_body', 'lower_body', 'dresses']:
             return Response({'error': 'category is invalid'}, status=status.HTTP_400_BAD_REQUEST)
         
