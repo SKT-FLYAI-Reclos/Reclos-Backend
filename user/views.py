@@ -10,6 +10,9 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
+from django.core.files.base import ContentFile
+from django.core.files.temp import NamedTemporaryFile
+
 from .models import User, Level, Closet
 from .serializers import UserSerializer, LevelSerializer, ClosetSerializer
 
@@ -151,6 +154,7 @@ class ClosetView(APIView):
         try:
             user = User.objects.get(id=id)
             image = request.data.get("image")
+            print(f'user cloth image url : {image}')
             uuid = image.split("/")[-1].split(".")[0]
             print(f'user cloth uuid from image url : {uuid}')
             
@@ -163,6 +167,17 @@ class ClosetView(APIView):
 
         except User.DoesNotExist:
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        image_request = requests.get(image)
+        if image_request.status_code != 200:
+            return Response({"error": "Failed to retrieve image"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        img_temp = NamedTemporaryFile(delete=True)
+        img_temp.write(image_request.content)
+        img_temp.flush()
+        
+        request.data["image"] = ContentFile(image_request.content, name=f"{uuid}.jpg")
+        img_temp.close()
         
         serializer = ClosetSerializer(data=request.data)
         if serializer.is_valid():
