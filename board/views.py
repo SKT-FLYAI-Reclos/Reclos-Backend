@@ -61,7 +61,7 @@ class BoardView(APIView):
                 if isinstance(image, str) and image.startswith('http'):
                     if 'remove_bg' in image:
                         kind = 'corrected'
-                    if 'ladi_vton' in image:
+                    elif 'ladi_vton' in image:
                         kind = 'ladi_vton'
                     else:
                         print(f'err kind')

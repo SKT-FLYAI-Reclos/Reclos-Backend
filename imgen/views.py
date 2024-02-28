@@ -116,11 +116,12 @@ class ImageLadiVtonView(views.APIView):
         category = 'upper_body' if category == None else category
         if category not in ['upper_body', 'lower_body', 'dresses']:
             return Response({'error': 'category is invalid'}, status=status.HTTP_400_BAD_REQUEST)
+        print(f'category: {category}')
         
         cluster_response = requests.post(f'{AI_SERVER_IP}/cluster', json={'id': unique_id, 'category' : category})
         # print(f'cluster_response: {cluster_response.json()}')
         
-        #LadiVton
+        #LadiVtons
         reference_count = request.data.get('reference_count')
         if not reference_count:
             reference_count = 1
