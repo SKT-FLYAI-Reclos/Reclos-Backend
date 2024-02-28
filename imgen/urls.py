@@ -6,4 +6,5 @@ urlpatterns = [
     path('init/', views.AIServerInitView.as_view(), name='init'),
     path('rmbg/', views.ImageRemoveBackgroundView.as_view(), name='remove_bg'),
     path('ladivton/', views.ImageLadiVtonView.as_view(), name='ladivton'),
+    path('ladivtonbyref/', views.ImageLadiVtonByReferenceIdView.as_view(), name='ladivton_by_ref'),
 ]
