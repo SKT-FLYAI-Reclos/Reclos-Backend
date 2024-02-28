@@ -187,7 +187,8 @@ class ImageLadiVtonByReferenceIdView(views.APIView):
         if not reference_id:
             return Response({'error': 'reference_id is required'}, status=status.HTTP_400_BAD_REQUEST)
         
-        unique_id = image.name.split('/')[-1].split('.')[0]
+        print(f'image id : {image}')
+        unique_id = image.split("/")[-1].split(".")[0]
         print(f'unique_id from image ladivton by reference_id: {unique_id}')
         
         request_data = {
