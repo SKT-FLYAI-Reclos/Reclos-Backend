@@ -9,6 +9,8 @@ class Board(models.Model):
     price = models.IntegerField(default=0, null = False, blank = False)
     gender = models.CharField(max_length=100, default="not-set")
     size = models.CharField(max_length=100, default="not-set")
+    esg_water = models.IntegerField(default=0)
+    esg_co2 = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

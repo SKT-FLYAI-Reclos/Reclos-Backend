@@ -62,7 +62,7 @@ class ImageRemoveBackgroundView(views.APIView):
             return Response({'error': 'Image is required'}, status=status.HTTP_400_BAD_REQUEST)
         
         unique_id = str(uuid.uuid4())
-        print(f'unique_id: {unique_id}')
+        print(f'unique_id from image remove: {unique_id}')
         
         try:
             response = requests.post(f'{AI_SERVER_IP}/rmbg', files={'image': image}, data={'id': unique_id})
@@ -97,6 +97,7 @@ class ImageLadiVtonView(views.APIView):
     
     def post(self, request):
         unique_id = request.data.get('uuid')
+        print(f'unique_id from image ladivton: {unique_id}')
         
         if not unique_id:
             return Response({'error': 'uuid is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -108,7 +109,7 @@ class ImageLadiVtonView(views.APIView):
         # try:       
         # seg
         clothseg_response = requests.post(f'{AI_SERVER_IP}/clothseg', json={'id': unique_id})
-        print(f'clothseg_response: {clothseg_response.json()}')
+        # print(f'clothseg_response: {clothseg_response.json()}')
         
         #cluster
         category = request.data.get('category')
@@ -117,7 +118,7 @@ class ImageLadiVtonView(views.APIView):
             return Response({'error': 'category is invalid'}, status=status.HTTP_400_BAD_REQUEST)
         
         cluster_response = requests.post(f'{AI_SERVER_IP}/cluster', json={'id': unique_id, 'category' : category})
-        print(f'cluster_response: {cluster_response.json()}')
+        # print(f'cluster_response: {cluster_response.json()}')
         
         #LadiVton
         reference_count = request.data.get('reference_count')
@@ -130,11 +131,12 @@ class ImageLadiVtonView(views.APIView):
         for index in range(reference_count):
             reference_id = reference_ids[index] + "_0"
             ladivton_response = requests.post(f'{AI_SERVER_IP}/ladivton', json={'id': unique_id, 'reference_id': reference_id, 'index':index})
-            print(f'ladivton_response: {ladivton_response.json()}')
+            # print(f'ladivton_response: {ladivton_response.json()}')
             image_data = ladivton_response.json().get('image')
-            if not image_data:
+            
+            """ if not image_data:
                 print('No image data')
-                return Response('No image data', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response('No image data', status=status.HTTP_500_INTERNAL_SERVER_ERROR)"""
             
             image = PIL.Image.open(io.BytesIO(base64.b64decode(image_data)))
             img_io = io.BytesIO()
@@ -159,6 +161,7 @@ class ImageLadiVtonView(views.APIView):
                 return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)"""
             
         print(f'response : {response}')
+        print(f'I got response!')
         return Response(response, status=status.HTTP_200_OK)
             
 

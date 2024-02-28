@@ -1,3 +1,4 @@
+import random
 from django.shortcuts import render
 from django.core.files import File
 from django.core.files.base import ContentFile
@@ -40,6 +41,7 @@ class BoardView(APIView):
 
     def post(self, request):
         serializer = BoardSerializer(data=request.data)
+        
         if serializer.is_valid():
             board = serializer.save(author=request.user)
             image_files = request.FILES.getlist("image")
@@ -62,7 +64,13 @@ class BoardView(APIView):
                     img_name = img_url.split('/')[-1]  # Extract a simple name from the URL
                     img_temp = ContentFile(response.content, name=img_name)
                     Image.objects.create(board=board, image=img_temp, kind=kinds.pop(0))
-
+            
+            esg_water = random.randint(100, 500)
+            esg_co2 = random.choice([1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2])
+            board.esg_water = esg_water
+            board.esg_co2 = esg_co2
+            board.save()
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
