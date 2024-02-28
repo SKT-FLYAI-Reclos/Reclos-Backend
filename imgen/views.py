@@ -105,61 +105,62 @@ class ImageLadiVtonView(views.APIView):
         if not user:
             return Response({'error': 'user is required'}, status=status.HTTP_400_BAD_REQUEST)
         
-        try:       
-            # seg
-            clothseg_response = requests.post(f'{AI_SERVER_IP}/clothseg', json={'id': unique_id})
-            print(f'clothseg_response: {clothseg_response.json()}')
+        # try:       
+        # seg
+        clothseg_response = requests.post(f'{AI_SERVER_IP}/clothseg', json={'id': unique_id})
+        print(f'clothseg_response: {clothseg_response.json()}')
+        
+        #cluster
+        category = request.data.get('category')
+        category = 'upper_body' if category == None else category
+        if category not in ['upper_body', 'lower_body', 'dresses']:
+            return Response({'error': 'category is invalid'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        cluster_response = requests.post(f'{AI_SERVER_IP}/cluster', json={'id': unique_id, 'category' : category})
+        print(f'cluster_response: {cluster_response.json()}')
+        
+        #LadiVton
+        reference_count = request.data.get('reference_count')
+        if not reference_count:
+            reference_count = 1
             
-            #cluster
-            category = request.data.get('category')
-            category = 'upper_body' if category == None else category
-            if category not in ['upper_body', 'lower_body', 'dresses']:
-                return Response({'error': 'category is invalid'}, status=status.HTTP_400_BAD_REQUEST)
+        reference_ids = cluster_response.json().get('cluster_id_list')
+        
+        response = []
+        for index in range(reference_count):
+            reference_id = reference_ids[index] + "_0"
+            ladivton_response = requests.post(f'{AI_SERVER_IP}/ladivton', json={'id': unique_id, 'reference_id': reference_id, 'index':index})
+            print(f'ladivton_response: {ladivton_response.json()}')
+            image_data = ladivton_response.json().get('image')
+            if not image_data:
+                print('No image data')
+                return Response('No image data', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-            cluster_response = requests.post(f'{AI_SERVER_IP}/cluster', json={'id': unique_id, 'category' : category})
-            print(f'cluster_response: {cluster_response.json()}')
+            image = PIL.Image.open(io.BytesIO(base64.b64decode(image_data)))
+            img_io = io.BytesIO()
+            image.save(img_io, format='JPEG')
+            image_content = ContentFile(img_io.getvalue(), name=f'{unique_id}_{index}.jpg')
             
-            #LadiVton
-            reference_count = request.data.get('reference_count')
-            if not reference_count:
-                reference_count = 1
-                
-            reference_ids = cluster_response.json().get('cluster_id_list')
+            serializer_data = {
+                'uuid': unique_id, 
+                'user': user, 
+                'category': category, 
+                'image': image_content,
+                'status': 'success'
+                }
             
-            response = []
-            for index in range(reference_count):
-                reference_id = reference_ids[index] + "_0"
-                ladivton_response = requests.post(f'{AI_SERVER_IP}/ladivton', json={'id': unique_id, 'reference_id': reference_id})
-                print(f'ladivton_response: {ladivton_response.json()}')
-                image_data = ladivton_response.json().get('image')
-                if not image_data:
-                    return Response('No image data', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            serializer = ImageLadiVtonSerializer(data=serializer_data)
+            
+            if serializer.is_valid():
+                serializer.save()
+                response.append(serializer.data)
                 
-                image = PIL.Image.open(io.BytesIO(base64.b64decode(image_data)))
-                img_io = io.BytesIO()
-                image.save(img_io, format='JPEG')
-                image_content = ContentFile(img_io.getvalue(), name=f'{unique_id}.jpg')
-                
-                serializer_data = {
-                    'uuid': unique_id, 
-                    'user': user, 
-                    'category': category, 
-                    'image': image_content,
-                    'status': 'success'
-                    }
-                
-                serializer = ImageLadiVtonSerializer(data=serializer_data)
-                print(serializer_data)
-                
-                if serializer.is_valid():
-                    serializer.save()
-                    response.append(serializer.data)
-                else:
-                    return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                
+            """else:
+                return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)"""
+            
+        print(f'response : {response}')
+        return Response(response, status=status.HTTP_200_OK)
+            
 
-            return Response(response, status=status.HTTP_200_OK)
-    
-
-        except Exception as e:
-            return Response({'error': 'Image LadiVton failed', 'message' : e}, status=status.HTTP_400_BAD_REQUEST)
+        """except Exception as e:
+            return Response({'error': 'Image LadiVton failed', 'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)"""
