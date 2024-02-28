@@ -153,10 +153,6 @@ class ClosetView(APIView):
     def post(self, request, id):
         try:
             user = User.objects.get(id=id)
-            image = request.data.get("image")
-            print(f'user cloth image url : {image}')
-            uuid = image.split("/")[-1].split(".")[0]
-            print(f'user cloth uuid from image url : {uuid}')
             
             access_token = request.headers.get("Authorization", "").split("Bearer ")[-1]
             if not access_token:
@@ -168,22 +164,16 @@ class ClosetView(APIView):
         except User.DoesNotExist:
             return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         
-        image_request = requests.get(image)
-        if image_request.status_code != 200:
-            return Response({"error": "Failed to retrieve image"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        img_temp = NamedTemporaryFile(delete=True)
-        img_temp.write(image_request.content)
-        img_temp.flush()
-        
-        image = ContentFile(image_request.content, name=f"{uuid}.jpg")
-        img_temp.close()
+        image = request.data.get("image")
+        print(f'user cloth image url : {image}')
+        uuid = image.split("/")[-1].split(".")[0]
+        print(f'user cloth uuid from image url : {uuid}')
         
         serializer = ClosetSerializer(data=request.data)
         if serializer.is_valid():
             # Assuming your serializer handles the image file correctly
             serializer.save(user=user)
-            return Response(serializer.data(image = image), status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
