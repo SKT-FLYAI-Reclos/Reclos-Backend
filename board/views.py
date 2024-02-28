@@ -57,7 +57,9 @@ class BoardView(APIView):
             # Handle the uploaded image files
             for index in range(len(all_images)):
                 image = all_images[index]
-                
+                if isinstance(image, str):
+                    continue
+                    
                 Image.objects.create(board=board, image=image, kind=kinds[index], reference_id=reference_ids[index])
 
             # Now, handle the image URLs
