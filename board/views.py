@@ -59,13 +59,21 @@ class BoardView(APIView):
                 image = all_images[index]
                 print(f'Processing image {index}: {image}')
                 if isinstance(image, str) and image.startswith('http'):
+                    if 'remove_bg' in image:
+                        kind = 'corrected'
+                    if 'ladi_vton' in image:
+                        kind = 'ladi_vton'
+                    else:
+                        print(f'err kind')
+                        
                     response = requests.get(image)  # Get the image from the URL
                     if response.status_code == 200:
                         img_name = image.split('/')[-1]
                         img_temp = ContentFile(response.content, name=img_name)
-                        Image.objects.create(board=board, image=img_temp, kind=kinds[index], reference_id=reference_ids[index])
+                        Image.objects.create(board=board, image=img_temp, kind=kind, reference_id=reference_ids[index])
                 else:
-                    Image.objects.create(board=board, image=image, kind=kinds[index], reference_id=reference_ids[index])
+                    print(f'upload image: {image}')
+                    Image.objects.create(board=board, image=image, kind='original', reference_id=reference_ids[index])
 
             esg_water = random.randint(100, 500)
             esg_co2 = random.choice([1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2])
