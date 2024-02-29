@@ -198,7 +198,7 @@ class ImageLadiVtonByReferenceIdView(views.APIView):
         clothseg_response = requests.post(f'{AI_SERVER_IP}/clothseg', json={'id': unique_id})
         # print(f'clothseg_response: {clothseg_response.json()}')
         
-        
+        category = request.data.get('category')
         print(f'ladivton by reference_id category: {category}')
         category = 'lower_body' if category == None else category
         if category not in ['upper_body', 'lower_body', 'dresses']:
