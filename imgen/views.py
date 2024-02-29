@@ -191,6 +191,7 @@ class ImageLadiVtonByReferenceIdView(views.APIView):
         print(f'image id : {image}')
         unique_id = image.split("/")[-1].split(".")[0]
         print(f'unique_id from image ladivton by reference_id: {unique_id}')
+        print(f'reference id at ladivton by reference_id: {reference_id}')
         
         # try:       
         # seg
