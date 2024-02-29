@@ -131,7 +131,7 @@ class ImageLadiVtonView(views.APIView):
         response = []
         for index in range(reference_count):
             reference_id = reference_ids[index] + "_0"
-            ladivton_response = requests.post(f'{AI_SERVER_IP}/ladivton', json={'id': unique_id, 'reference_id': reference_id, 'index':index, 'input_category' : category})
+            ladivton_response = requests.post(f'{AI_SERVER_IP}/ladivton', json={'id': unique_id, 'reference_id': reference_id, 'input_category' : category, 'index':index})
             # print(f'ladivton_response: {ladivton_response.json()}')
             image_data = ladivton_response.json().get('image')
             referene_id = ladivton_response.json().get('reference_id')
@@ -209,7 +209,7 @@ class ImageLadiVtonByReferenceIdView(views.APIView):
         response = []
         for index in range(reference_count):
             ladivton_response = requests.post(f'{AI_SERVER_IP}/ladivton', json={'id': unique_id, 'reference_id': reference_id, 'index':index, 
-                                                                                'category': category})
+                                                                                'input_category': category})
             # print(f'ladivton_response: {ladivton_response.json()}')
             image_data = ladivton_response.json().get('image')
             referene_id = ladivton_response.json().get('reference_id')
