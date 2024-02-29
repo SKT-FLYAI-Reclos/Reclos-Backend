@@ -198,26 +198,17 @@ class ImageLadiVtonByReferenceIdView(views.APIView):
         clothseg_response = requests.post(f'{AI_SERVER_IP}/clothseg', json={'id': unique_id})
         # print(f'clothseg_response: {clothseg_response.json()}')
         
-        #cluster
-        category = request.data.get('category')
+        
         print(f'ladivton by reference_id category: {category}')
         category = 'lower_body' if category == None else category
         if category not in ['upper_body', 'lower_body', 'dresses']:
             return Response({'error': 'category is invalid'}, status=status.HTTP_400_BAD_REQUEST)
         
-        cluster_response = requests.post(f'{AI_SERVER_IP}/cluster', json={'id': unique_id, 'category' : category})
-        # print(f'cluster_response: {cluster_response.json()}')
-        
-        #LadiVton
-        reference_count = request.data.get('reference_count')
-        if not reference_count:
-            reference_count = 1
-            
-        reference_ids = cluster_response.json().get('cluster_id_list')
+        reference_count = 1
         
         response = []
         for index in range(reference_count):
-            reference_id = reference_ids[index] + "_0"
+            reference_id = reference_id + "_0"
             ladivton_response = requests.post(f'{AI_SERVER_IP}/ladivton', json={'id': unique_id, 'reference_id': reference_id, 'index':index, 
                                                                                 'category': category})
             # print(f'ladivton_response: {ladivton_response.json()}')
