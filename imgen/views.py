@@ -208,7 +208,6 @@ class ImageLadiVtonByReferenceIdView(views.APIView):
         
         response = []
         for index in range(reference_count):
-            reference_id = reference_id + "_0"
             ladivton_response = requests.post(f'{AI_SERVER_IP}/ladivton', json={'id': unique_id, 'reference_id': reference_id, 'index':index, 
                                                                                 'category': category})
             # print(f'ladivton_response: {ladivton_response.json()}')
