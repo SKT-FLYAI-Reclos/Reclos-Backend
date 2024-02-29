@@ -133,7 +133,9 @@ class MyLikeView(APIView):
 class MyLikeByIdView(APIView):
     permission_classes = [AllowAny]
     def get(self, request, id):
-        likes = Like.objects.filter(user=request.user, board_id=id)
+        print(f'get my like by id : {id}')
+        user = User.objects.get(id=id)
+        likes = Like.objects.filter(user=user, board_id=id)
         if likes:
             return Response({"liked": True})
         return Response({"liked": False})
